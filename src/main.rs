@@ -7,8 +7,8 @@ struct Ball{ // crateing a ball, and defining all the properties a ball might ne
     radius: f32, // size of the ball
     //velocity: f32 // speed, if this is positive it goes down, if negative goes up
     velocity_x: f32,
-    velocity_y: f32
-    // creating sepearte velocites for both axes
+    velocity_y: f32,// creating sepearte velocites for both axes
+    trail: Vec<(f32, f32)> // creating a vector which will have tuples of 2 values of type of f32
 }
 impl Ball{ // we are adding the properties to the ball
     fn new() -> Self{ // this is a constructure, creates a new ball with starting values
@@ -16,17 +16,31 @@ impl Ball{ // we are adding the properties to the ball
             x: screen_width()/2.0,
             y: 50.0, // 50 pixels from top
             // screen_width/2.0= in the mide of screen
-            radius: 20.0,
+            radius: 15.0,
         // velocity: 0.0, // not moving yet
         velocity_x: 0.0,
-        velocity_y: 0.0
+        velocity_y: 0.0,
+        trail: Vec::new() // initalize and empty vector 
         }
     }
     fn draw(&self){
-        draw_circle(self.x, self.y, self.radius, RED);
-    }// drawing a circle with these propersties
+        // now we are adding trails to the ball
+        for (index, &position) in self.trail.iter().enumerate(){
+            let (trail_x, trail_y) = position;
+            let alpha = 1.0 - (index as f32 / self.trail.len() as f32) * 0.99;
+            let clr = Color::new(   1.0,0.0,0.0, alpha); // the parameters are, R, G, B, A
+            // thats just Red blue and green with A = transperency 
+            draw_circle(trail_x, trail_y, self.radius*0.8, clr);// drawing a circle with these propersties
+        } // so now we wont just the exact position of the ball but also the previous position of it,
+        draw_circle(self.x, self.y, self.radius, RED);// drawing a circle with these propersties
+        
+    }
     fn update(&mut self){ // updating the ball's physics
         // &mut self allows it to modify self
+        self.trail.push((self.x, self.y)); // push adds the tuple of current positon (x,y) into the trail vector
+        if self.trail.len() > 6{ // we dont want to keep all the old positions, so we set a limit
+            self.trail.remove(0);
+        } // this will remove the oldest postion, i.e at index: 0
         self.velocity_y += 0.5; // gravity acceleration
         self.velocity_x *= 0.9;
         self.y += self.velocity_y; // update the possiton based on velocity
@@ -82,7 +96,14 @@ async fn main() {
         }
         ball.update(); // update physics
         ball.draw(); // Draw the ball
+        // lets draw boundries,
+        //Syntax: draw_line(initial_x, initial_y, final_x, final_y, thinkness_of_line, Color_of_line)
+        draw_line(0.0,0.0, screen_width(),0.0, 2.0, BLUE );// the celing 
+        draw_line(0.0, screen_height(), screen_width(), screen_height(), 2.0, BLUE);// floor
+        draw_line(0.0, 0.0, 0.0, screen_height(), 2.0, BLUE);// left wall
+        draw_line(screen_width(), 0.0, screen_width(), screen_height(), 2.0, BLUE);
         // showing info
+        // synatx:
         draw_text(&format!("FPS: {}", get_fps()), 10.0, 20.0, 20.0, WHITE); // draws text on screen
         draw_text(&format!("vertical Velcoity {:.2}", ball.velocity_y), 10.0, 45.0, 20.0, WHITE);
         draw_text(&format!("Horizontal Velcoity: {:.2}", ball.velocity_x), 10.0, 70.0, 20.0, WHITE);
