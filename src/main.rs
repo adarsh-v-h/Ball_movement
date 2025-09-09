@@ -27,10 +27,12 @@ impl Ball{ // we are adding the properties to the ball
         // now we are adding trails to the ball
         for (index, &position) in self.trail.iter().enumerate(){
             let (trail_x, trail_y) = position;
-            let alpha = 1.0 - (index as f32 / self.trail.len() as f32) * 0.99;
-            let clr = Color::new(   1.0,0.0,0.0, alpha); // the parameters are, R, G, B, A
-            // thats just Red blue and green with A = transperency 
-            draw_circle(trail_x, trail_y, self.radius*0.8, clr);// drawing a circle with these propersties
+            if self.trail.len() >0{
+                let alpha = 1.0 - (index as f32 / self.trail.len() as f32) * 0.5;
+                let clr = Color::new(   1.0,0.0,0.0, alpha); // the parameters are, R, G, B, A
+                // thats just Red blue and green with A = transperency 
+                draw_circle(trail_x, trail_y, self.radius*0.8, clr);// drawing a circle with these propersties
+            }
         } // so now we wont just the exact position of the ball but also the previous position of it,
         draw_circle(self.x, self.y, self.radius, RED);// drawing a circle with these propersties
         
@@ -109,7 +111,7 @@ async fn main() {
         draw_text(&format!("Horizontal Velcoity: {:.2}", ball.velocity_x), 10.0, 70.0, 20.0, WHITE);
         draw_text(&format!("Positon: {:.2}", ball.y), 10.0, 95.0, 20.0 ,WHITE);  
         // draw_text takes, a string value and display it, and the posit
-        draw_text(&format!(" Press SPACE to jump "), 5.0, 120.0, 20.0, LIGHTGRAY);// to show the option to jump
+        //draw_text(&format!(" Press SPACE to jump "), 5.0, 120.0, 20.0, LIGHTGRAY);// to show the option to jump
         next_frame().await; // waits for the next fps frame
     }
 }
