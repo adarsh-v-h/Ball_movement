@@ -1,0 +1,3 @@
+Using macroquad::prelunde to use many functions, 
+We use multiple functions to take key inputs and perform certain actions of the ball.
+starting with vertical motion and the adding horizontal motion.
